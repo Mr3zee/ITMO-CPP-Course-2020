@@ -19,7 +19,7 @@ struct sort_block {
     std::string origin_string;
     // first sorting index
     size_t fsi = std::string::npos;
-    // last sorting index
+    // number of characters
     size_t num = std::string::npos;
 };
 
@@ -29,20 +29,19 @@ pss find_part_of(const std::string& line, size_t pos, size_t count, const std::s
         first = line.find_first_not_of(separator, last);
         last = line.find_first_of(separator, first);
     }
-    pos = (first == std::string::npos ? line.length() : first);
-    count = (last == std::string::npos ? line.length() : last);
-    return {pos, count};
+    return {(first == std::string::npos ? line.length() : first),
+            (last == std::string::npos ? line.length() : last)};
 }
 
 sort_block split(const std::string& line, const parameters& args) {
-    if (args.key_field1 == -1) return {line, 0, line.length()};
-    size_t first = 0, last = args.key_field1;
-    pss retval = find_part_of(line, first, last, args.column_separator);
+    if (args.key_field1 < 1) return {line, 0, line.length()};
+    pss retval = find_part_of(line, 0, args.key_field1, args.column_separator);
     if (args.key_field2 == -1) {
         return {line, retval.first, retval.second - retval.first};
     }
+    size_t first = retval.first;
     retval = find_part_of(line, retval.second, args.key_field2 - args.key_field1, args.column_separator);
-    return {line, retval.first, retval.second - retval.first};
+    return {line, first, retval.second - first};
 }
 
 bool compare(const sort_block& block1, const sort_block& block2) {
