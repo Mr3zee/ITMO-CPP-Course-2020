@@ -9,4 +9,5 @@
 - [Sort command line utility](https://github.com/Mr3zee/ITMO-CPP-Course-2020/tree/master/sort-k-t-Mr3zee/src)
 - [Randomized queue](https://github.com/Mr3zee/ITMO-CPP-Course-2020/tree/master/randomized-queue-Mr3zee/src)
 - [Inverted index](https://github.com/Mr3zee/ITMO-CPP-Course-2020/tree/master/inverted-index-Mr3zee/src)
+- [8 puzzle](https://github.com/Mr3zee/ITMO-CPP-Course-2020/tree/master/8-puzzle-Mr3zee/src)
 
