@@ -1,0 +1,13 @@
+*.iml
+*.class
+*.ini
+*.txt
+**/.idea/**
+**/out/**
+**/base/**
+*.xml
+*.icls
+*.cmd
+**/lib/**
+*.nrepl-port
+**/cmake-build-debug/**
