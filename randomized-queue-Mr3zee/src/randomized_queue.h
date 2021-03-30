@@ -7,66 +7,6 @@
 #include <random>
 #include <algorithm>
 
-#define ITERATOR(type, qualifier) \
-    struct type { \
-        using iterator_category = std::bidirectional_iterator_tag; \
-        using value_type = T; \
-        using difference_type = long long; \
-        using pointer = typename std::vector<T>::type; \
-        using reference = qualifier&; \
-     private: \
-        pointer _ptr; \
-        std::vector<size_t> _permutation; \
-        size_t _index; \
-    public: \
-        explicit type(const pointer ptr, size_t size, size_t index, std::mt19937_64 &generator) : \
-         _ptr(ptr), \
-         _permutation(detail::generate_random_permutation(size + 1, generator)),\
-         _index(index) {} \
-         \
-        pointer current() const { \
-            return _ptr + _permutation[_index]; \
-        } \
-        \
-        bool operator==(const type &other) const { \
-            return current() == other.current(); \
-        } \
-        \
-        bool operator!=(const type &other) const { \
-            return current() != other.current(); \
-        } \
-        \
-        reference operator*() const { \
-            return *current(); \
-        } \
-        \
-        qualifier* operator->() const { \
-            return current(); \
-        } \
-        \
-        type &operator++() { \
-            _index++; \
-            return *this; \
-        } \
-        \
-        type operator++(int) { \
-            auto retval = *this; \
-            _index++; \
-            return retval; \
-        } \
-        \
-        type &operator--() { \
-            _index--; \
-            return *this; \
-        } \
-        \
-        type operator--(int) { \
-            auto retval = *this; \
-            _index--; \
-            return retval; \
-        } \
-    };
-
 namespace detail {
     std::mt19937_64 get_random_generator();
 
@@ -74,6 +14,66 @@ namespace detail {
 
     std::vector<size_t> generate_random_permutation(size_t size, std::mt19937_64 &generator);
 }
+
+template<class T>
+class Iterator {
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = long long;
+    using pointer = value_type *;
+    using reference = value_type &;
+private:
+    pointer _ptr;
+    std::vector<size_t> _permutation;
+    size_t _index;
+public:
+    explicit Iterator(const pointer ptr, size_t size, size_t index, std::mt19937_64 &generator) :
+            _ptr(ptr),
+            _permutation(detail::generate_random_permutation(size + 1, generator)),
+            _index(index) {}
+
+    pointer current() const {
+        return _ptr + _permutation[_index];
+    }
+
+    bool operator==(const Iterator &other) const {
+        return current() == other.current();
+    }
+
+    bool operator!=(const Iterator &other) const {
+        return current() != other.current();
+    }
+
+    reference operator*() const {
+        return *current();
+    }
+
+    value_type *operator->() const {
+        return current();
+    }
+
+    Iterator &operator++() {
+        _index++;
+        return *this;
+    }
+
+    Iterator operator++(int) {
+        auto retval = *this;
+        _index++;
+        return retval;
+    }
+
+    Iterator &operator--() {
+        _index--;
+        return *this;
+    }
+
+    Iterator operator--(int) {
+        auto retval = *this;
+        _index--;
+        return retval;
+    }
+};
 
 template<class T>
 class randomized_queue {
@@ -100,7 +100,7 @@ public:
     }
 
     // move constructor
-    randomized_queue(randomized_queue<T> &&other)  noexcept {
+    randomized_queue(randomized_queue<T> &&other) noexcept {
         elements = std::move(other.elements);
         generator = detail::get_random_generator();
     }
@@ -160,31 +160,31 @@ public:
         return elements[generate_index()];
     }
 
-    ITERATOR(iterator, T)
+//    ITERATOR(iterator, T)
+//
+//    ITERATOR(const_iterator, const T)
 
-    ITERATOR(const_iterator, const T)
-
-    iterator begin() {
+    Iterator<T> begin() {
         return iterator(elements.begin(), elements.size(), 0, generator);
     }
 
-    const_iterator begin() const {
+    Iterator<const T> begin() const {
         return const_iterator(elements.begin(), elements.size(), 0, generator);
     }
 
-    iterator end() {
+    Iterator<T> end() {
         return iterator(elements.begin(), elements.size(), elements.size(), generator);
     }
 
-    const_iterator end() const {
+    Iterator<const T> end() const {
         return const_iterator(elements.begin(), elements.size(), elements.size(), generator);
     }
 
-    const_iterator cbegin() const {
+    Iterator<const T> cbegin() const {
         return const_iterator(elements.begin(), elements.size(), 0, generator);
     }
 
-    const_iterator cend() const {
+    Iterator<const T> cend() const {
         return const_iterator(elements.begin(), elements.size(), elements.size(), generator);
     }
 };
